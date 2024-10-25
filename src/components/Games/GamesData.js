@@ -1,0 +1,43 @@
+export const gamesData = [
+    {
+        id: 1,
+        title: "Game Title 1",
+        image: "https://via.placeholder.com/150",
+        followers: 150,
+        rating: 4.5,
+        description: "An epic adventure in a vast world.",
+        releaseDate: "2023-01-15",
+        playtime: 20,
+    },
+    {
+        id: 2,
+        title: "Game Title 2",
+        image: "https://via.placeholder.com/150",
+        followers: 300,
+        rating: 4.7,
+        description: "A thrilling journey through time.",
+        releaseDate: "2022-05-22",
+        playtime: 15,
+    },
+    {
+        id: 3,
+        title: "Game Title 3",
+        image: "https://via.placeholder.com/150",
+        followers: 250,
+        rating: 4.2,
+        description: "Solve puzzles and explore new realms.",
+        releaseDate: "2021-11-10",
+        playtime: 30,
+    },
+    {
+        id: 4,
+        title: "Game Title 4",
+        image: "https://via.placeholder.com/150",
+        followers: 120,
+        rating: 3.9,
+        description: "Fight for survival in a post-apocalyptic world.",
+        releaseDate: "2023-03-01",
+        playtime: 25,
+    },
+    // Add more game objects as needed
+];
