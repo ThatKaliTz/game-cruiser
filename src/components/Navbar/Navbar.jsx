@@ -2,12 +2,13 @@ import React, { useState } from "react";
 import Logo from "../../assets/logosmall.png";
 import { IoMdSearch } from "react-icons/io";
 import { Link } from "react-router-dom";
-
 const Navbar = () => {
     const [isSignupOpen, setSignupOpen] = useState(false); // State for Sign Up popup
     const [isLoginOpen, setLoginOpen] = useState(false); // State for Login popup
     const [formData, setFormData] = useState({
         name: "",
+        lastname: "",
+        user: "",
         email: "",
         password: "",
         confirmPassword: "",
@@ -23,63 +24,126 @@ const Navbar = () => {
         }));
     };
 
-    const handleSignupSubmit = (e) => {
-        e.preventDefault();
-        // Add your signup logic here
-        setSignupOpen(false);
-    };
+    function handleSignupSubmit(event) {
+        event.preventDefault();
+        
+        const usuario = {
+            nombre: formData.name,
+            apellido: formData.lastname,
+            user: formData.user,  // Puedes agregar más campos aquí si los necesitas
+            foto: '',
+            email: formData.email,  
+            password: formData.password,
+        };
+    
+        fetch('http://localhost:5119/api/usuarios', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(usuario)
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Usuario guardado:', data);
+            alert('Usuario guardado correctamente.');
+        })
+        .catch(error => {
+            console.error('Error al guardar usuario:', error);
+        });
+    }
 
-    const handleLoginSubmit = (e) => {
+    const [loggedInUser, setLoggedInUser] = useState(null);
+
+    const handleLoginSubmit = async (e) => {
         e.preventDefault();
-        // Add your login logic here
-        setLoginOpen(false);
+    
+        const loginData = {
+            nombre: '',
+            apellido: '',
+            user: '',  // Puedes agregar más campos aquí si los necesitas
+            foto: '',
+            email: formData.email,  
+            password: formData.password,
+        };
+        
+        try {
+            const response = await fetch("http://localhost:5119/api/usuarios/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(loginData),
+            });
+    
+            if (response.ok) {
+                const data = await response.json();
+                console.log("Login successful:", data);
+    
+                if (data.user) {
+                    alert("Login successful");
+                    setLoggedInUser(data.user); // Guarda el nombre del usuario
+                } else {
+                    console.warn("Login successful, but user data is missing.");
+                }
+    
+                setLoginOpen(false); // Cerrar el modal de login
+            } else {
+                alert("Login failed: Invalid credentials");
+            }
+        } catch (error) {
+            console.error("Error during login:", error);
+        }
     };
 
     return (
         <div className="bg-primary">
-            <div className="container">
-                <div className="flex justify-between items-center">
-                    <div className="flex gap-4 items-center text-white">
-                        <Link to="/"> {/* Change href to Link to */}
-                            <img src={Logo} alt="Logo" className="w-16" />
-                        </Link>
-                        <div>
-                            <ul className="flex gap-8 items-center">
-                                <li className="relative">
-                                    <input type="search" name="search" id="search" placeholder="Search games.." className="bg-gray-700/50 px-4 py-2 rounded-2xl" />
-                                    <IoMdSearch className="absolute top-1/2 -translate-y-1/2 right-3" />
-                                </li>
-                                <li>
-                                    <Link to="/user" className="cursor-pointer">User</Link>
-                                </li>
-                                <li>
-                                    <Link to="/games" className="cursor-pointer">Games</Link> {/* Update to use Link */}
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div className="text-white">
-                        <ul className="flex gap-4 items-center">
+        <div className="container">
+            <div className="flex justify-between items-center">
+                <div className="flex gap-4 items-center text-white">
+                    <Link to="/">
+                        <img src={Logo} alt="Logo" className="w-16" />
+                    </Link>
+                    <div>
+                        <ul className="flex gap-8 items-center">
                             <li>
-                                <a 
-                                    onClick={() => setLoginOpen(true)} // Open login popup
-                                    className="bg-gray-700 inline-block px-6 py-3 rounded-2xl font-semibold cursor-pointer"
-                                >
-                                    Login
-                                </a>
+                                <input type="search" placeholder="Search games.." className="bg-gray-700/50 px-4 py-2 rounded-2xl" />
                             </li>
                             <li>
-                                <a 
-                                    onClick={() => setSignupOpen(true)} // Open sign up popup
-                                    className="bg-pinkish inline-block px-6 py-3 rounded-2xl font-semibold cursor-pointer"
-                                >
-                                    Sign Up
-                                </a>
+                            <Link to="/user" className="cursor-pointer">User
+                                    {loggedInUser ? `Hello, ${loggedInUser}` : "User"}
+                                    </Link>
+                            </li>
+                            <li>
+                                <Link to="/games" className="cursor-pointer">Games</Link>
                             </li>
                         </ul>
                     </div>
                 </div>
+                <div className="text-white">
+                    <ul className="flex gap-4 items-center">
+                        {loggedInUser ? (
+                            <li>
+                                <span>Welcome, {loggedInUser}</span>
+                            </li>
+                        ) : (
+                            <>
+                                <li>
+                                    <a onClick={() => setLoginOpen(true)} className="bg-gray-700 px-6 py-3 rounded-2xl font-semibold cursor-pointer">
+                                        Login
+                                    </a>
+                                </li>
+                                <li>
+                                    <a onClick={() => setSignupOpen(true)} className="bg-pinkish px-6 py-3 rounded-2xl font-semibold cursor-pointer">
+                                        Sign Up
+                                    </a>
+                                </li>
+                            </>
+                        )}
+                    </ul>
+                </div>
             </div>
+        </div>
 
             {/* Popup for Sign Up */}
             {isSignupOpen && (
@@ -101,6 +165,32 @@ const Navbar = () => {
                                     id="name"
                                     maxLength="16"
                                     value={formData.name}
+                                    onChange={handleInputChange}
+                                    required
+                                    className="bg-black border border-pinkish p-2 w-full rounded-2xl"
+                                />
+                            </div>
+                            <div className="mb-4">
+                                <label className="block mb-1" htmlFor="name">last name (max 16 characters):</label>
+                                <input
+                                    type="text"
+                                    name="lastname"
+                                    id="lastname"
+                                    maxLength="16"
+                                    value={formData.lastname}
+                                    onChange={handleInputChange}
+                                    required
+                                    className="bg-black border border-pinkish p-2 w-full rounded-2xl"
+                                />
+                            </div>
+                            <div className="mb-4">
+                                <label className="block mb-1" htmlFor="name">Username (max 16 characters):</label>
+                                <input
+                                    type="text"
+                                    name="user"
+                                    id="user"
+                                    maxLength="16"
+                                    value={formData.user}
                                     onChange={handleInputChange}
                                     required
                                     className="bg-black border border-pinkish p-2 w-full rounded-2xl"
