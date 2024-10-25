@@ -8,6 +8,7 @@ import NavFoot from "./NavFoot.jsx";
 import Games from "./views/Games.jsx";
 import User from "./views/User.jsx";
 import LandingPage from "./views/LandingPage.jsx";
+import GameDetails from "./views/GamesDetail.jsx";
 
 const App = () => {
   return (
@@ -18,6 +19,7 @@ const App = () => {
             {/* <Route path="/trending" element={<TrendingGames />} />
             <Route path="/articles" element={<RecommendedArticles />} /> */}
             <Route path="/games" element={<Games />} /> {/* Add new route here */}
+            <Route path="/gamesdetails" element={<GameDetails />} /> {/* Add new route here */}
             <Route path="/user" element={<User />} />
           </Routes>
       </NavFoot>

@@ -148,7 +148,7 @@ const Navbar = () => {
             {/* Popup for Sign Up */}
             {isSignupOpen && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                    <div className="bg-primary text-white border border-pinkish p-6 rounded-lg w-11/12 md:w-1/3 relative">
+                    <div className="bg-primary text-white border border-pinkish p-6 rounded-lg w-11/12 md:w-1/3 relative z-10">
                         <button
                             onClick={() => setSignupOpen(false)} // Close the popup
                             className="absolute top-2 right-2 text-pinkish text-xl focus:outline-none"
