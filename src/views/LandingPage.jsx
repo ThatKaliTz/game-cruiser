@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { FaFire } from "react-icons/fa";
 import { FaStar, FaRegStarHalf, FaRegStar } from "react-icons/fa";
 import OmoriPoster from "/src/assets/posters/post_omori.jpg"; // Import your image
@@ -60,14 +61,32 @@ const game3Cover = {
   height: "100%",
 };
 
+const renderStars = (rating) => {
+  const fullStars = Math.floor(rating);
+  const hasHalfStar = rating % 1 !== 0;
+  const stars = [];
+
+  for (let i = 0; i < 5; i++) {
+    if (i < fullStars) {
+      stars.push(<FaStar key={i} className="text-yellow-400" />);
+    } else if (i === fullStars && hasHalfStar) {
+      stars.push(<FaRegStarHalf key={i} className="text-yellow-400" />);
+    } else {
+      stars.push(<FaRegStar key={i} className="text-yellow-400" />);
+    }
+  }
+
+  return stars;
+}
+
 const GameCardData = [
-    { id: 1, title: "Omori", image: OmoriPoster, followers: 30 }, // Use imported image
-    { id: 2, title: "Hi-Fi Rush", image: HiFiPoster, followers: 30 }, 
-    { id: 3, title: "Hades", image: HadesPoster, followers: 30 }, 
-    { id: 4, title: "Metaphor: Re-Fantazio", image: MetaphorPoster, followers: 30 }, 
-    { id: 5, title: "God of War", image: GOWPoster, followers: 30 }, 
-    { id: 6, title: "Cuphead", image: CupheadPoster, followers: 30 }, 
-  ];
+  { id: 1, title: "Omori", image: OmoriPoster, rating: 4.5 }, // Use imported image
+  { id: 2, title: "Hi-Fi Rush", image: HiFiPoster, rating: 5 }, 
+  { id: 3, title: "Hades", image: HadesPoster, rating: 5 }, 
+  { id: 4, title: "Metaphor: Re-Fantazio", image: MetaphorPoster, rating: 3 }, 
+  { id: 5, title: "God of War", image: GOWPoster, rating: 4 }, 
+  { id: 6, title: "Cuphead", image: CupheadPoster, rating: 3 }, 
+];
 
 const Hero = () => (
   <div className="bg-primary container">
@@ -96,18 +115,23 @@ const TrendingGames = () => (
       </div>
       <div className="relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-6 gap-4 mt-8">
-          {GameCardData.map((item) => (
-            <div key={item.id}>
-              <img src={item.image} alt={item.title} className="w-full h-[200px] object-cover rounded-xl" />
-              <div className="text-center">
-                <p>{item.title}</p>
-                <p className="flex items-center justify-center gap-2">
-                  <FaFire />
-                  <span>{item.followers}</span> followers
-                </p>
+
+          {GameCardData.map((game) => (
+              <div key={game.id} className="bg-gray-800 rounded-lg overflow-hidden relative">
+              <Link to="/gamesdetails">
+              <img 
+                  src={game.image} 
+                  alt={game.title} 
+                  className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 flex flex-col justify-center items-center bg-black bg-opacity-70 opacity-0 hover:opacity-100 transition-opacity duration-200">
+                  <h3 className="font-semibold text-white">{game.title}</h3>
+                  <div className="flex">{renderStars(game.rating)}</div>
               </div>
-            </div>
+              </Link>
+              </div>
           ))}
+          
         </div>
       </div>
     </div>

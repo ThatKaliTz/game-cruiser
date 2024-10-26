@@ -1,3 +1,5 @@
+
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
@@ -13,7 +15,8 @@ export default {
         yellowish: "#F4C33F",
       },
       fontFamily: {
-
+        sans: ['Roboto', 'sans-serif'], // Example with a Google font
+        heading: ['Merriweather', 'serif'], // Example with a serif font for headings
       },
       container:{
         center: true,

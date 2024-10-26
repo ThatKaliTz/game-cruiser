@@ -106,9 +106,10 @@ const Navbar = () => {
                     </Link>
                     <div>
                         <ul className="flex gap-8 items-center">
-                            <li>
-                                <input type="search" placeholder="Search games.." className="bg-gray-700/50 px-4 py-2 rounded-2xl" />
-                            </li>
+                             <li className="relative">
+                                    <input type="search" placeholder="Search games.." className="bg-gray-700/50 px-4 py-2 rounded-2xl" />
+                                    <IoMdSearch className="absolute top-1/2 -translate-y-1/2 right-3 cursor-pointer" />
+                                </li>
                             <li>
                             <Link to="/user" className="cursor-pointer">
                                     {loggedInUser ? `Hello, ${loggedInUser}` : "User"}
@@ -147,8 +148,8 @@ const Navbar = () => {
 
             {/* Popup for Sign Up */}
             {isSignupOpen && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                    <div className="bg-primary text-white border border-pinkish p-6 rounded-lg w-11/12 md:w-1/3 relative z-10">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                    <div className="bg-primary text-white border border-pinkish p-6 rounded-lg w-11/12 md:w-1/3 relative">
                         <button
                             onClick={() => setSignupOpen(false)} // Close the popup
                             className="absolute top-2 right-2 text-pinkish text-xl focus:outline-none"
@@ -259,7 +260,7 @@ const Navbar = () => {
 
             {/* Popup for Login */}
             {isLoginOpen && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
                     <div className="bg-primary text-white border border-pinkish p-6 rounded-lg w-11/12 md:w-1/3 relative">
                         <button
                             onClick={() => setLoginOpen(false)} // Close the popup
