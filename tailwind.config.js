@@ -13,17 +13,23 @@ export default {
         yellowish: "#F4C33F",
       },
       fontFamily: {
-
+        funnel: ['Funnel Display', 'sans-serif'], 
+        grotesk: ['"Host Grotesk"', 'sans-serif'], 
+        worksans: ['Work Sans', 'sans-serif'], 
       },
-      container:{
+      container: {
         center: true,
         padding: {
           DEFAULT: "1rem",
           md: "2rem",
-        }
+        },
+      },
+      screens: {
+        lg: '1024px',
       },
     },
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/line-clamp'),
+  ],
 }
-
