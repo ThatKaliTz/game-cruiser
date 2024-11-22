@@ -17,7 +17,7 @@ const App = () => {
             {/* <Route path="/trending" element={<TrendingGames />} />
             <Route path="/articles" element={<RecommendedArticles />} /> */}
             <Route path="/games" element={<Games />} /> {/* Add new route here */}
-            <Route path="/gamesdetails" element={<GameDetails />} /> 
+            <Route path="/gamesdetails/:nombre" element={<GameDetails />} />
             <Route path="/friendprofile" element={<FriendProfile />} /> 
             <Route path="/friendprofile/profile" element={<FriendProfile />} />
             <Route path="/friendprofile/games" element={<FriendProfile />} />

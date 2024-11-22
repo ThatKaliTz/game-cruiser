@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState , useEffect } from "react";
+import { useParams } from "react-router-dom";
 import { FaStar, FaRegStarHalf, FaRegStar } from "react-icons/fa";
 
 
@@ -92,6 +93,26 @@ const renderStars = (rating) => {
 
 
 const GameDetails = () => {
+  const { nombre } = useParams(); // Obtener el ID del juego de la URL
+  const [game, setGame] = useState(null); // Estado para almacenar los datos del juego
+
+  useEffect(() => {
+    // Fetch para obtener los detalles del juego
+    const fetchGameDetails = async () => {
+      try {
+        const response = await fetch(`http://localhost:5119/api/juegos/${nombre}`); // Ajusta la URL según tu backend
+        const data = await response.json();
+        setGame(data); // Guardar los datos del juego en el estado
+      } catch (error) {
+        console.error("Error fetching game details:", error);
+      }
+    };
+
+    fetchGameDetails();
+  }, [nombre]);
+
+  
+  
   const [activeTab, setActiveTab] = useState("Details");
   const [currentPage, setCurrentPage] = useState(1);
   const reviewsPerPage = 4; // 
@@ -163,7 +184,9 @@ const handleSubmitTopic = () => {
       setCurrentPage(page);
     }
   };
-   
+  if (!game) {
+    return <div className="text-white">Loading...</div>;
+  } 
   const renderStars = (rating, size = "text-xl") => {
     const fullStars = Math.floor(rating);
     const hasHalfStar = rating % 1 !== 0;
@@ -180,6 +203,7 @@ const handleSubmitTopic = () => {
     }
   
     return stars;
+    
   };
 
   return (
@@ -192,9 +216,9 @@ const handleSubmitTopic = () => {
           {/* Left Side: Game Information */}
           <div className="lg:col-span-2">
             
-            <dev className="text-center lg:text-left">
+            <div className="text-center lg:text-left">
               {/* Game Title */}
-              <h1 className="text-4xl font-bold mb-4">Metaphor: ReFantazio</h1>
+              <h1 className="text-4xl font-bold mb-4">{game.nombre}</h1>
             
               {/* Tabs */}
               <div className="mb-5">
@@ -210,7 +234,7 @@ const handleSubmitTopic = () => {
                   </button>
                 ))}
               </div>
-            </dev>
+            </div>
           
 
             {/* Tab Content */}

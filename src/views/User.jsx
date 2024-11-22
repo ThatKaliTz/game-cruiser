@@ -85,17 +85,19 @@ const Review = ({ comment }) => {
 
 
 const User = () => {
+  
   const { loggedInUser } = useAuth();
     const location = useLocation();
     const [activeTab, setActiveTab] = useState("Profile")
     const [profileOption, setProfileOption] = useState("Profile Information");
     const [userData, setUserData] = useState({
       
-      username: "User",
-      name: "Name",
-      email: "user@example.com",
-      bio: "This is a sample bio.",
-      profilePicture: "https://via.placeholder.com/100",
+      user: "",
+      nombre: "",
+      email: "",
+      foto: "https://via.placeholder.com/100",
+      apellido: "",
+      password: "",
     });
     const [selectedImage, setSelectedImage] = useState(null);
 
@@ -210,11 +212,67 @@ const User = () => {
       const file = e.target.files[0];
       if (file) {
         const imageUrl = URL.createObjectURL(file);
-        setSelectedImage(imageUrl);
+        setSelectedImage(file); // Guardamos el archivo real para subirlo luego
         setUserData((prevData) => ({
           ...prevData,
-          profilePicture: imageUrl,
+          profilePicturePreview: imageUrl, // Mostramos la vista previa
         }));
+      }
+    };
+    
+    const handleConfirmChanges = async () => {
+      try {
+        let uploadedImageUrl = userData.foto; // Mantener la URL actual si no se cambió
+    
+        if (selectedImage) {
+          const formData = new FormData();
+          formData.append("image", selectedImage);
+    
+          // Subimos la imagen al backend
+          const uploadResponse = await fetch("http://localhost:5119/api/usuarios/upload", {
+            method: "POST",
+            body: formData,
+          });
+    
+          if (!uploadResponse.ok) {
+            throw new Error("Error uploading the image");
+          }
+    
+          const { imageUrl } = await uploadResponse.json();
+          uploadedImageUrl = imageUrl; // Nueva URL de la imagen
+        }
+    
+        // Actualizamos el usuario en la base de datos
+        const updateResponse = await fetch("http://localhost:5119/api/usuarios/", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            foto: uploadedImageUrl,
+            user: userData.user,
+            nombre: userData.nombre,
+            email: loggedInUser.email,
+            password: userData.password,
+            apellido: ""
+          }),
+        });
+    
+        if (!updateResponse.ok) {
+          throw new Error("Error updating the user");
+        }
+        if (updateResponse.ok) {
+          const data = await updateResponse.json();
+          if (data) {
+              localStorage.setItem("loggedInUser", JSON.stringify(data));
+              window.location.reload();
+          }
+      }
+        
+        
+      } catch (error) {
+        console.error(error);
+        alert("An error occurred while confirming changes.");
       }
     };
     
@@ -258,7 +316,7 @@ const User = () => {
              <div className="flex flex-col md:flex-row h-[600px] overflow-y-auto">
             {/* Profile Options Menu */}
             <div className="w-full md:w-1/4 bg-primary border border-blueish p-4 rounded-lg mb-4 md:mb-0 pt-8">
-              {["Profile Information", "Edit Profile", "Sign Out"]. ap((option) => (
+              {["Profile Information", "Edit Profile", "Sign Out"].map((option) => (
                 <button
                   key={option}
                   onClick={() => setProfileOption(option)}
@@ -274,7 +332,7 @@ const User = () => {
               {profileOption === "Profile Information" && (
                 <div className="flex flex-col items-center">
                   <h2 className="text-2xl font-bold mb-4">Profile Information</h2>
-                  <img src={loggedInUser?.nombre || "Guest User"} alt="User Profile" className="w-32 h-32 rounded-full mb-4" />
+                  <img src={loggedInUser?.foto || "Guest User"} alt="User Profile" className="w-32 h-32 rounded-full mb-4" />
                   <h2 className="text-2xl font-bold text-center mb-6">{loggedInUser?.user}</h2>
 
                   <div className="bg-primary border border-blueish p-6 rounded-lg shadow-md w-full max-w-md">
@@ -284,79 +342,76 @@ const User = () => {
                     <p className="text-gray-300 mb-4">
                       <span className="text-blueish font-semibold">Email:</span> {loggedInUser?.email}
                     </p>
-                    <p className="text-gray-300">
-                      <span className="text-blueish font-semibold">Bio:</span> {userData.bio}
-                    </p>
+                
                   </div>
                 </div>
               )}
               {profileOption === "Edit Profile" && (
-                <div>
-                 <h2 className="text-2xl font-bold mb-4 text-center">Edit Profile</h2>
-                  <div className="flex justify-center mb-4">
-                    <img 
-                      src={userData.profilePicture} 
-                      alt="User Profile" 
-                      className="w-32 h-32 rounded-full" 
-                    />
-                  </div>
-
-                  <div className="mx-10">
-                    <form>
-                      <label className="block mb-2">
-                        <span className="text-white">Profile Picture:</span>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleImageChange}
-                          className="w-full mt-1 rounded bg-gray-700 text-white"
-                        />
-                      </label>
-                      <label className="block mb-2">
-                        <span className="text-white">Username:</span>
-                        <input
-                          type="text"
-                          name="username"
-                          value={userData.username}
-                          onChange={handleInputChange}
-                          className="w-full mt-1 px-2 py-1 rounded bg-gray-700 text-white"
-                        />
-                      </label>
-                      <label className="block mb-2">
-                        <span className="text-white">Name:</span>
-                        <input
-                          type="text"
-                          name="name"
-                          value={userData.name}
-                          onChange={handleInputChange}
-                          className="w-full mt-1 px-2 py-1 rounded bg-gray-700 text-white"
-                        />
-                      </label>
-                      <label className="block mb-2">
-                        <span className="text-white">Email:</span>
-                        <input
-                          type="email"
-                          name="email"
-                          value={userData.email}
-                          onChange={handleInputChange}
-                          className="w-full mt-1 px-2 py-1 rounded bg-gray-700 text-white"
-                        />
-                      </label>
-
-                      {/* Confirm Changes Button */}
-                      <div className="mt-4 flex justify-center">
-                        <button
-                          type="button"
-                          onClick={() => alert("Changes have been confirmed!")} // Replace with your confirmation logic
-                          className="bg-yellow-500 hover:bg-yellow-400 text-black px-4 py-2 rounded-md font-semibold"
-                        >
-                          Confirm Changes
-                        </button>
-                      </div>
-                    </form>
-                  </div>
-                </div>
-              )}
+    <div>
+      <h2 className="text-2xl font-bold mb-4 text-center">Edit Profile</h2>
+      <div className="flex justify-center mb-4">
+        <img
+          src={userData.profilePicturePreview || userData.foto}
+          alt="User Profile"
+          className="w-32 h-32 rounded-full"
+        />
+      </div>
+      <div className="mx-10">
+        <form>
+          {/* Input de imagen */}
+          <label className="block mb-2">
+            <span className="text-white">Profile Picture:</span>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="w-full mt-1 rounded bg-gray-700 text-white"
+            />
+          </label>
+          {/* Campos de texto */}
+          <label className="block mb-2">
+            <span className="text-white">Username:</span>
+            <input
+              type="text"
+              name="user"
+              value={userData.user}
+              onChange={handleInputChange}
+              className="w-full mt-1 px-2 py-1 rounded bg-gray-700 text-white"
+            />
+          </label>
+          <label className="block mb-2">
+            <span className="text-white">Name:</span>
+            <input
+              type="text"
+              name="nombre"
+              value={userData.nombre}
+              onChange={handleInputChange}
+              className="w-full mt-1 px-2 py-1 rounded bg-gray-700 text-white"
+            />
+          </label>
+          <label className="block mb-2">
+            <span className="text-white">Password:</span>
+            <input
+              name="password"
+              value={userData.password}
+              onChange={handleInputChange}
+              className="w-full mt-1 px-2 py-1 rounded bg-gray-700 text-white"
+            />
+          </label>
+          {/* Confirmar cambios */}
+          <div className="mt-4 flex justify-center">
+            <button
+              type="button"
+              onClick={handleConfirmChanges}
+              className="bg-yellow-500 hover:bg-yellow-400 text-black px-4 py-2 rounded-md font-semibold"
+            >
+              Confirm Changes
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )}
             </div>
           </div>
           </div>
