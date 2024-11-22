@@ -10,6 +10,7 @@ import MetaphorPoster from "/src/assets/posters/post_metaphor.png";
 import GOWPoster from "/src/assets/posters/post_godofwar.jpg";
 import P3RPoster from "/src/assets/posters/post_persona3r.jpg"; 
 import CupheadPoster from "/src/assets/posters/post_cuphead.jpg"; 
+import { useAuth } from "/src/AuthContext";
 
 const reviewsData = [
   { gameName: "Game Title 1", rating: 4.5, comment: "Great game with an amazing storyline!", coverImage: "https://via.placeholder.com/100" },
@@ -84,11 +85,13 @@ const Review = ({ comment }) => {
 
 
 const User = () => {
+  const { loggedInUser } = useAuth();
     const location = useLocation();
     const [activeTab, setActiveTab] = useState("Profile")
     const [profileOption, setProfileOption] = useState("Profile Information");
     const [userData, setUserData] = useState({
-      username: "Username",
+      
+      username: "User",
       name: "Name",
       email: "user@example.com",
       bio: "This is a sample bio.",
@@ -96,6 +99,7 @@ const User = () => {
     });
     const [selectedImage, setSelectedImage] = useState(null);
 
+    
 
     const itemsPerPageGames = 12; // Number of items per page for Games, Reviews, and Friends
     const itemsPerPageReviews = 6;
@@ -159,6 +163,8 @@ const User = () => {
 
 
     useEffect(() => {
+  
+     
       if (location.pathname === "/user/profile") {
         setActiveTab("Profile");
       }
@@ -172,7 +178,7 @@ const User = () => {
         setActiveTab("Friends");
       }
 
-    }, [location.pathname]);
+    }, [location.pathname] );
 
     const renderStars = (rating) => {
         const fullStars = Math.floor(rating);
@@ -211,17 +217,21 @@ const User = () => {
         }));
       }
     };
-  
+    
     return (
       <div className="container mx-auto p-4 font-grotesk">
-        <div className="flex items-center mb-6">
-          <img 
-            src={userData.profilePicture} 
-            alt="User Profile"
-            className="w-24 h-24 rounded-full mr-4"
-          />
-          <h1 className="text-3xl font-bold text-white">{userData.username}</h1>
-        </div>
+      <div className="flex items-center mb-6">
+        
+          <>
+            <img 
+              src={loggedInUser?.foto} 
+              alt="User Profile"
+              className="w-24 h-24 rounded-full mr-4"
+            />
+            <h1 className="text-3xl font-bold text-white">{loggedInUser?.user}</h1>
+          </>
+   
+      </div>
         
         {/* Tabs */}
         <div className="mb-4 flex flex-wrap justify-center sm:justify-start sm:flex-row flex-col items-center sm:items-start space-y-2 sm:space-y-0">
@@ -248,7 +258,7 @@ const User = () => {
              <div className="flex flex-col md:flex-row h-[600px] overflow-y-auto">
             {/* Profile Options Menu */}
             <div className="w-full md:w-1/4 bg-primary border border-blueish p-4 rounded-lg mb-4 md:mb-0 pt-8">
-              {["Profile Information", "Edit Profile", "Sign Out"].map((option) => (
+              {["Profile Information", "Edit Profile", "Sign Out"]. ap((option) => (
                 <button
                   key={option}
                   onClick={() => setProfileOption(option)}
@@ -264,15 +274,15 @@ const User = () => {
               {profileOption === "Profile Information" && (
                 <div className="flex flex-col items-center">
                   <h2 className="text-2xl font-bold mb-4">Profile Information</h2>
-                  <img src={userData.profilePicture} alt="User Profile" className="w-32 h-32 rounded-full mb-4" />
-                  <h2 className="text-2xl font-bold text-center mb-6">{userData.username}</h2>
+                  <img src={loggedInUser?.nombre || "Guest User"} alt="User Profile" className="w-32 h-32 rounded-full mb-4" />
+                  <h2 className="text-2xl font-bold text-center mb-6">{loggedInUser?.user}</h2>
 
                   <div className="bg-primary border border-blueish p-6 rounded-lg shadow-md w-full max-w-md">
                     <p className="text-gray-300 mb-4">
-                      <span className="text-blueish font-semibold">Name:</span> {userData.name}
+                      <span className="text-blueish font-semibold">Name:</span> {loggedInUser?.nombre}
                     </p>
                     <p className="text-gray-300 mb-4">
-                      <span className="text-blueish font-semibold">Email:</span> {userData.email}
+                      <span className="text-blueish font-semibold">Email:</span> {loggedInUser?.email}
                     </p>
                     <p className="text-gray-300">
                       <span className="text-blueish font-semibold">Bio:</span> {userData.bio}

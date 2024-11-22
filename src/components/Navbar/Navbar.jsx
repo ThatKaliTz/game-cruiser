@@ -1,10 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 import Logo from "../../assets/logosmall.png";
 import { IoMdSearch, IoMdMenu} from "react-icons/io";
 import { Link } from "react-router-dom";
 import '../../styles/general.css';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from "/src/AuthContext";
 
 const Navbar = () => {
+  
+    const { loggedInUser, setLoggedInUser , logout} = useAuth();
     const [isSignupOpen, setSignupOpen] = useState(false); // State for Sign Up popup
     const [isLoginOpen, setLoginOpen] = useState(false); // State for Login popup
     const [formData, setFormData] = useState({
@@ -22,16 +26,23 @@ const Navbar = () => {
     const [isUserDropdownOpen, setUserDropdownOpen] = useState(false);
     const [isClicked, setIsClicked] = useState(false);
     const [isBlueClicked, setBlueClicked] = useState(false);
-
+    
     const closeDropdown = () => {
         setUserDropdownOpen(false);
         setMenuOpen(false); // Ensures mobile menu also closes
     };
+    const dataUser = () => {
+        console.log("xdddd")
+    }
+
+
+
+
 
     const handleUserClick = (event) => {
         setIsClicked(true); // Set isClicked to true when the user button is clicked
         setUserDropdownOpen(!isUserDropdownOpen);
-        isMenuOpen(false);
+        setMenuOpen(!isMenuOpen);
         
         // Remove the clicked class after 300ms to reset the effect
         setTimeout(() => {
@@ -108,6 +119,17 @@ const Navbar = () => {
                 const data = await response.json();
                 console.log("Login successful:", data);
                 setLoginOpen(false);
+    
+                if (data.user) {
+                    alert("Login successful");
+                    setLoggedInUser(data); // Guarda el usuario en el estado local
+    
+                    // Guarda los datos del usuario en localStorage
+                   
+                    localStorage.setItem("loggedInUser", JSON.stringify(data));
+                } else {
+                    console.warn("Login successful, but user data is missing.");
+                }
             } else {
                 alert("Login failed: Invalid credentials");
             }
@@ -115,10 +137,10 @@ const Navbar = () => {
             console.error("Error during login:", error);
         }
     };
-
+    const navigate = useNavigate(); // Inicializa el hook
     return (
+        
         <div className="bg-primary font-grotesk">
-
              {/* Navbar 1 */}
             <div className="container mx-auto flex justify-between items-center py-4 px-4 sm:px-7 md:px-7">
                 <div className="flex items-center">
@@ -147,62 +169,79 @@ const Navbar = () => {
                     </div>
                 </div>
                     <div className="hidden lg:flex gap-4 text-white items-center">
-                        {/* User dropdown toggle */}
-                        <div className="relative">
-                            <button
-                                onClick={handleUserClick}                                
-                                className={`cursor-pointer bg-black border border-yellowish hover:bg-yellowish hover:text-black px-5 py-2 
-                                    rounded-2xl font-semibold min-w-[80px] text-center ${
-                                        isUserDropdownOpen === true ? "bg-yellowish text-black" : "bg-primary border border-yellowish text-white"
-                                }`}
-                            >
-                                User
-                            </button>
-                            {isUserDropdownOpen && (
-                                <div style={{ zIndex: 999 }} className="absolute right-0 mt-2 bg-black border border-yellowish rounded-lg w-48 py-2 text-center">
-                                    <Link
-                                        to="/user/profile"
-                                        className="block px-4 py-2 hover:bg-yellowish hover:text-black hover:font-semibold"
-                                        onClick={() => setUserDropdownOpen(false)}
-                                    >
-                                        Profile
-                                    </Link>
-                                    <Link
-                                        to="/user/games"
-                                        className="block px-4 py-2 hover:bg-yellowish hover:text-black hover:font-semibold"
-                                        onClick={() => setUserDropdownOpen(false)}
-                                    >
-                                        Games
-                                    </Link>
-                                    <Link
-                                        to="/user/reviews"
-                                        className="block px-4 py-2 hover:bg-yellowish hover:text-black hover:font-semibold"
-                                        onClick={() => setUserDropdownOpen(false)}
-                                    >
-                                        Reviews
-                                    </Link>
-                                    <Link
-                                        to="/user/friends"
-                                        className="block px-4 py-2 hover:bg-yellowish hover:text-black hover:font-semibold"
-                                        onClick={() => setUserDropdownOpen(false)}
-                                    >
-                                        Friends
-                                    </Link>
-                                    <button
-                                        className="block w-full px-4 py-2 text-center hover:bg-yellowish hover:text-black hover:font-semibold"
-                                        onClick={() => setUserDropdownOpen(false)}
-                                    >
-                                        Logout
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-                        <button onClick={() => setLoginOpen(true)} className="bg-gray-700 hover:bg-gray-800 px-5 py-2 rounded-2xl font-semibold min-w-[80px] text-center">
-                            Login
-                        </button>
-                        <button onClick={() => setSignupOpen(true)} className="bg-pinkish hover:bg-pink-700 px-5 py-2 rounded-2xl font-semibold min-w-[80px] text-center">
-                            Sign Up
-                        </button>
+                    {loggedInUser ? (
+        // Dropdown de usuario
+        <div className="relative">
+            <button
+                onClick={handleUserClick}
+                className={`cursor-pointer bg-black border border-yellowish hover:bg-yellowish hover:text-black px-5 py-2 
+                    rounded-2xl font-semibold min-w-[80px] text-center ${
+                        isUserDropdownOpen ? "bg-yellowish text-black" : "bg-primary border border-yellowish text-white"
+                }`}
+            >   
+                Hello, {loggedInUser.user || "User"}
+            </button>
+            {isUserDropdownOpen && (
+                <div style={{ zIndex: 999 }} className="absolute right-0 mt-2 bg-black border border-yellowish rounded-lg w-48 py-2 text-center">
+                    <Link
+                        to="/user/profile"
+                        className="block px-4 py-2 hover:bg-yellowish hover:text-black hover:font-semibold"
+                        onClick={() => setUserDropdownOpen(false)}
+                    >
+                        Profile
+                    </Link>
+                    <Link
+                        to="/user/games"
+                        className="block px-4 py-2 hover:bg-yellowish hover:text-black hover:font-semibold"
+                        onClick={() => setUserDropdownOpen(false)}
+                    >
+                        Games
+                    </Link>
+                    <Link
+                        to="/user/reviews"
+                        className="block px-4 py-2 hover:bg-yellowish hover:text-black hover:font-semibold"
+                        onClick={() => setUserDropdownOpen(false)}
+                    >
+                        Reviews
+                    </Link>
+                    <Link
+                        to="/user/friends"
+                        className="block px-4 py-2 hover:bg-yellowish hover:text-black hover:font-semibold"
+                        onClick={() => setUserDropdownOpen(false)}
+                    >
+                        Friends
+                    </Link>
+                    <button
+                        className="block w-full px-4 py-2 text-center hover:bg-yellowish hover:text-black hover:font-semibold"
+                        onClick={() => {
+                            setUserDropdownOpen(false);
+                            navigate("/")
+                            logout();
+                        }}
+                    >
+                        Logout
+                    </button>
+                </div>
+            )}
+        </div>
+    ) : (
+        // Botones de Login y Sign Up
+        <>
+            <button
+            
+                onClick={() => setLoginOpen(true)}
+                className="bg-gray-700 hover:bg-gray-800 px-5 py-2 rounded-2xl font-semibold min-w-[80px] text-center"
+            >
+                Login
+            </button>
+            <button
+                onClick={() => setSignupOpen(true)}
+                className="bg-pinkish hover:bg-pink-700 px-5 py-2 rounded-2xl font-semibold min-w-[80px] text-center"
+            >
+                Sign Up
+            </button>
+        </>
+    )}
                     </div>
                     <div className="lg:hidden block items-center">
                         <div>
@@ -239,7 +278,8 @@ const Navbar = () => {
                             isUserDropdownOpen === true ? "bg-yellowish text-black" : "bg-primary border border-yellowish text-white"
                         }`}
                     >
-                        User
+                         
+                         {loggedInUser.user ? `Hello, ${loggedInUser.user}` : "User"}
                     </button>
                     {isUserDropdownOpen && (
                         <div className="absolute left-0 right-0 mt-2 bg-black border border-yellowish rounded-lg w-full py-2 text-center z-10">
@@ -263,7 +303,8 @@ const Navbar = () => {
                                 Friends
                             </Link>
                             <button className="block w-full px-4 py-2 text-center hover:bg-yellowish hover:text-black hover:font-semibold"
-                            onClick={() => {onClick={closeDropdown}; setMenuOpen(false);}}>
+                            onClick={() => {closeDropdown; setMenuOpen(false);navigate("/");
+                                logout();}}>
                                 Logout
                             </button>
                         </div>
