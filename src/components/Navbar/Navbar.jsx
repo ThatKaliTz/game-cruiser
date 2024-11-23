@@ -32,6 +32,10 @@ const Navbar = () => {
     genero: "",
     anio: "",
     sinopsis: "",
+    dmain: "", 
+    dcomp: "", 
+    publisher: "", 
+    developer: "", 
     calificacion: "", 
   });
   const [isMenuOpen, setMenuOpen] = useState(false); // State for mobile menu
@@ -70,7 +74,7 @@ const Navbar = () => {
         uploadedImageUrl = imageUrl; // Nueva URL de la imagen
       }
   
-      // Actualizamos el usuario en la base de datos
+      // Actualizamos el juego en la base de datos
       const updateResponse = await fetch("http://localhost:5119/api/juegos/", {
         method: "POST",
         headers: {
@@ -83,6 +87,10 @@ const Navbar = () => {
           anio: gameData.anio,
           genero: gameData.genero,
           sinopsis: gameData.sinopsis,
+          dmain: gameData.dmain, 
+          dcomp: gameData.dcomp, 
+          publisher: gameData.publisher, 
+          developer: gameData.developer, 
           calificacion: gameData.calificacion, 
         }),
       });
@@ -704,7 +712,7 @@ const Navbar = () => {
           onClick={() => setAdminOpen(false)} // Close the popup if clicked outside
         >
           <div
-            className="bg-primary text-white border border-pinkish p-6 rounded-lg w-[11/12] min-w-[1000px] max-h-[90vh] overflow-y-auto sm:w-[300px] md:w-[400px] lg:w-1/3 xl:w-1/4 xl:max-w-[600px] relative"
+            className="bg-primary text-white border border-pinkish p-6 rounded-lg w-[11/12] min-w-[1000px] min-h-[90vh] max-h-[90vh] overflow-y-auto sm:w-[300px] md:w-[400px] lg:w-1/3 xl:w-1/4 xl:max-w-[600px] relative"
             onClick={(e) => e.stopPropagation()} // Prevent close if clicked inside
           >
             <button
@@ -713,7 +721,7 @@ const Navbar = () => {
             >
               &times;
             </button>
-            <div className="flex bg-primary border border-blueish p-40 rounded-lg max-h-[700px] overflow-y-auto pt-8, justify-center , items-center" >
+            <div className="flex bg-primary border border-blueish p-40 rounded-lg max-h-[85vh] overflow-y-auto pt-8, justify-center , items-center" >
 
               { (
     <div>
@@ -796,6 +804,47 @@ const Navbar = () => {
               
               onChange={handleInputChangeGame}
               className="w-full mt-1 px-2 py-1 rounded bg-gray-700 text-white"
+            />
+          </label>
+          <label className="block mb-2">
+            <span className="text-white">Duracion completionista:</span>
+            <input
+            type="text"
+              name="dcomp"
+              
+              onChange={handleInputChangeGame}
+              className="w-full mt-1 px-2 py-1 rounded bg-gray-700 text-white"
+            />
+          </label>
+          <label className="block mb-2">
+            <span className="text-white">Duracion normal:</span>
+            <input
+            type="text"
+              name="dmain"
+              
+              onChange={handleInputChangeGame}
+              className="w-full mt-1 px-2 py-1 rounded bg-gray-700 text-white"
+            />
+          </label>
+
+          <label className="block mb-2">
+            <span className="text-white"> Publisher:           </span>
+            <input
+            type="text"
+              name="publisher"
+              
+              onChange={handleInputChangeGame}
+              className="w-50 mt-1 ml-1 px-2 py-1 rounded bg-gray-700 text-white"
+            />
+          </label>
+          <label className="block mb-2">
+            <span className="text-white">Developer:</span>
+            <input
+            type="text"
+              name="developer"
+              
+              onChange={handleInputChangeGame}
+              className="w-50 mt-1 ml-1 px-2 py-1 rounded bg-gray-700 text-white"
             />
           </label>
           {/* Confirmar cambios */}
